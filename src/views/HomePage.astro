@@ -1,0 +1,313 @@
+---
+import CallToAction from '../components/CallToAction.astro';
+import ContactCTA from '../components/ContactCTA.astro';
+import Grid from '../components/Grid.astro';
+import Hero from '../components/Hero.astro';
+import Icon from '../components/Icon.astro';
+import Pill from '../components/Pill.astro';
+import PortfolioPreview from '../components/PortfolioPreview.astro';
+import Skills from '../components/Skills.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+import { getLocale, getMessages, localizePath } from '../i18n';
+import { getWork } from '../lib/work';
+
+const locale = getLocale(Astro.currentLocale);
+const messages = getMessages(locale);
+const projects = (await getWork(locale)).slice(0, 2);
+
+const credentials = [
+    { key: 'degree', icon: 'graduation-cap', href: 'https://www.unileon.es/estudiantes/oferta-academica/grados/grado-en-ingenieria-informatica' },
+    { key: 'master', icon: 'graduation-cap', href: 'https://www.unileon.es/estudiantes/oferta-academica/masteres/mu-investigacion-ciberseguridad-presencial' },
+    { key: 'awsSAA', icon: 'cloud', href: 'https://www.credly.com/badges/3c2bc1b0-cd8d-472a-a5c9-c53afdfd20f0' },
+    { key: 'ciscoCyberOps', icon: 'shield-check', href: 'https://www.credly.com/badges/78fc7606-93b5-4b5f-96f4-6a05812ee950' },
+    { key: 'english', icon: 'translate', href: undefined },
+] as const;
+---
+
+<BaseLayout>
+	<div class="stack gap-20 lg:gap-48">
+		<div class="wrapper stack gap-8 lg:gap-20">
+			<header class="hero">
+				<Hero
+					title={messages.home.title}
+					tagline={messages.home.tagline}
+					align="start"
+				>
+					<div class="roles">
+						<Pill>
+							<Icon icon="code" size="1.33em" /> {messages.home.roles.developer}
+						</Pill>
+						<Pill>
+							<Icon icon="cloud" size="1.33em" /> {messages.home.roles.cloudEngineer}
+						</Pill>
+						<Pill>
+							<Icon icon="shield-check" size="1.33em" /> {messages.home.roles.cybersecurity}
+						</Pill>
+					</div>
+				</Hero>
+
+				<img
+					alt={messages.home.portraitAlt}
+					width="480"
+					height="620"
+					src="/assets/portrait.jpg"
+				/>
+			</header>
+
+			<Skills />
+		</div>
+
+		<main class="wrapper stack gap-20 lg:gap-48">
+			<section class="section with-background with-cta">
+				<header class="section-header stack gap-2 lg:gap-4">
+					<h3>{messages.home.workTitle}</h3>
+					<p>{messages.home.workDescription}</p>
+				</header>
+
+				<div class="gallery">
+					<Grid variant="offset">
+						{projects.map((project) => (
+							<li>
+								<PortfolioPreview project={project} />
+							</li>
+						))}
+					</Grid>
+				</div>
+
+				<div class="cta">
+					<CallToAction href={localizePath('/work/', locale)}>
+						{messages.home.viewAll}
+						<Icon icon="arrow-right" size="1.2em" />
+					</CallToAction>
+				</div>
+			</section>
+
+			<section class="section with-background bg-variant">
+				<header class="section-header stack gap-2 lg:gap-4">
+					<h3>{messages.home.credentials.title}</h3>
+					<p>{messages.home.credentials.description}</p>
+				</header>
+
+				<div class="gallery">
+					<Grid variant="small">
+						{credentials.map(({ key, icon, href }) => {
+							const credential = messages.home.credentials.items[key];
+
+							const content = (
+								<>
+									<Icon icon={icon} size="1.75rem" />
+									<strong>{credential.title}</strong>
+									<span>{credential.subtitle}</span>
+								</>
+							);
+
+							return (
+								<li class="credential-card">
+									{href ? (
+										<a href={href} target="_blank" rel="noopener noreferrer">
+											{content}
+										</a>
+									) : (
+										content
+									)}
+								</li>
+							);
+						})}
+					</Grid>
+				</div>
+			</section>
+		</main>
+
+		<ContactCTA />
+	</div>
+</BaseLayout>
+
+<style>
+	.hero {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2rem;
+	}
+
+	.roles {
+		display: none;
+	}
+
+	.hero img {
+		aspect-ratio: 5 / 4;
+		object-fit: cover;
+		object-position: center 75%;
+		border-radius: 1.5rem;
+		box-shadow: var(--shadow-md);
+	}
+
+	@media (min-width: 50em) {
+		.hero {
+			display: grid;
+			grid-template-columns: 6fr 4fr;
+			padding-inline: 2.5rem;
+			gap: 3.75rem;
+		}
+
+		.roles {
+			margin-top: 0.5rem;
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.hero img {
+			aspect-ratio: 3 / 4;
+			border-radius: 4.5rem;
+			object-fit: cover;
+		}
+	}
+
+	/* ====================================================== */
+
+	.section {
+		display: grid;
+		gap: 2rem;
+	}
+
+	.with-background {
+		position: relative;
+	}
+
+	.with-background::before {
+		--hero-bg: var(--bg-image-subtle-2);
+
+		content: '';
+		position: absolute;
+		pointer-events: none;
+		left: 50%;
+		width: 100vw;
+		aspect-ratio: calc(2.25 / var(--bg-scale));
+		top: 0;
+		transform: translateY(-75%) translateX(-50%);
+		background:
+			url('/assets/backgrounds/noise.png') top center/220px repeat,
+			var(--hero-bg) center center / var(--bg-gradient-size) no-repeat,
+			var(--gray-999);
+		background-blend-mode: overlay, normal, normal, normal;
+		mix-blend-mode: var(--bg-blend-mode);
+		z-index: -1;
+	}
+
+	.with-background.bg-variant::before {
+		--hero-bg: var(--bg-image-subtle-1);
+	}
+
+	.section-header {
+		justify-self: center;
+		text-align: center;
+		max-width: 50ch;
+		font-size: var(--text-md);
+		color: var(--gray-300);
+	}
+
+	.section-header h3 {
+		font-size: var(--text-2xl);
+	}
+
+	@media (min-width: 50em) {
+		.section {
+			grid-template-columns: repeat(4, 1fr);
+			grid-template-areas: 'header header header header' 'gallery gallery gallery gallery';
+			gap: 5rem;
+		}
+
+		.section.with-cta {
+			grid-template-areas: 'header header header cta' 'gallery gallery gallery gallery';
+		}
+
+		.section-header {
+			grid-area: header;
+			font-size: var(--text-lg);
+		}
+
+		.section-header h3 {
+			font-size: var(--text-4xl);
+		}
+
+		.with-cta .section-header {
+			justify-self: flex-start;
+			text-align: left;
+		}
+
+		.gallery {
+			grid-area: gallery;
+		}
+
+		.cta {
+			grid-area: cta;
+		}
+	}
+
+	/* ====================================================== */
+
+	.credential-card {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		gap: 0.75rem;
+
+		min-height: 10rem;
+		height: auto;
+		padding: 1.5rem;
+
+		border: 1px solid var(--gray-800);
+		border-radius: 1.5rem;
+		color: var(--gray-300);
+		background: var(--gradient-subtle);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.credential-card strong {
+		color: var(--gray-100);
+		line-height: 1.4;
+	}
+
+	.credential-card span {
+		line-height: 1.5;
+	}
+
+	.credential-card a {
+		color: inherit;
+	}
+
+	.credential-card:has(a) {
+		padding: 0;
+	}
+
+	.credential-card a {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: 0.75rem;
+		width: 100%;
+		min-height: 10rem;
+		padding: 1.5rem;
+		color: inherit;
+		text-decoration: none;
+		border-radius: inherit;
+	}
+
+	.credential-card:has(a) {
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.credential-card:has(a):hover {
+		transform: translateY(-4px);
+		box-shadow: var(--shadow-md);
+	}
+
+	.credential-card:has(a):focus-within {
+		outline: 2px solid currentColor;
+		outline-offset: 3px;
+	}
+</style>

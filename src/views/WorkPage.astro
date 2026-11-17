@@ -1,0 +1,37 @@
+---
+import ContactCTA from '../components/ContactCTA.astro';
+import Grid from '../components/Grid.astro';
+import Hero from '../components/Hero.astro';
+import PortfolioPreview from '../components/PortfolioPreview.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+import { getLocale, getMessages } from '../i18n';
+import { getWork } from '../lib/work';
+
+const locale = getLocale(Astro.currentLocale);
+const messages = getMessages(locale);
+const projects = await getWork(locale);
+---
+
+<BaseLayout
+	title={messages.work.metaTitle}
+	description={messages.work.metaDescription}
+>
+	<div class="stack gap-20">
+		<main class="wrapper stack gap-8">
+			<Hero
+				title={messages.work.title}
+				tagline={messages.work.tagline}
+				align="start"
+			/>
+			<Grid variant="offset">
+				{projects.map((project) => (
+					<li>
+						<PortfolioPreview project={project} />
+					</li>
+				))}
+			</Grid>
+		</main>
+		<ContactCTA />
+	</div>
+</BaseLayout>

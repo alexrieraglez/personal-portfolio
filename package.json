@@ -1,5 +1,5 @@
 {
-  "name": "personal-porfolio",
+  "name": "templateportfolio",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "test:i18n": "npm run build && node --test tests/i18n.test.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },

@@ -1,0 +1,124 @@
+---
+import { getLocale, getMessages, locales, localeNames, localizePath } from '../i18n';
+
+interface Props {
+	path?: string | undefined;
+}
+
+const locale = getLocale(Astro.currentLocale);
+const messages = getMessages(locale);
+const { path = Astro.url.pathname } = Astro.props;
+---
+
+<ul class="language-switcher" aria-label={messages.nav.language} style={`--active-index: ${locales.indexOf(locale)}`}>
+	{locales.map((language, index) => (
+		<li>
+			{index === 0 && <span class="indicator" aria-hidden="true" />}
+			<a
+				href={localizePath(path, language)}
+				hreflang={language}
+				lang={language}
+				aria-label={localeNames[language]}
+				title={localeNames[language]}
+				aria-current={locale === language ? 'true' : undefined}
+			>
+				<img src={`/assets/flags/${language}.svg`} alt="" width="24" height="16" />
+			</a>
+		</li>
+	))}
+</ul>
+
+<script>
+	// The router handles links/history; animate while it fetches the next static HTML.
+	// This document-level listener also handles selectors inserted by later navigations.
+	document.addEventListener('astro:before-preparation', (event) => {
+		const link = event.sourceElement?.closest<HTMLAnchorElement>('.language-switcher a');
+		const switcher = link?.closest('.language-switcher');
+		const indicator = switcher?.querySelector<HTMLElement>('.indicator');
+		if (!link || !switcher || !indicator || link.getAttribute('aria-current') === 'true') return;
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !indicator.animate) return;
+
+		const links = [...switcher.querySelectorAll('a')];
+		const from = links.findIndex((item) => item.getAttribute('aria-current') === 'true');
+		const to = links.indexOf(link);
+		const animation = indicator.animate(
+			[
+				{ transform: `translateX(${from * 100}%)` },
+				{ transform: `translateX(${to * 100}%)` },
+			],
+			{ duration: 180, easing: 'ease-in-out', fill: 'forwards' },
+		);
+		event.signal.addEventListener('abort', () => animation.cancel(), { once: true });
+		const load = event.loader;
+		event.loader = async () => {
+			await Promise.all([load(), animation.finished.catch(() => {})]);
+		};
+	});
+</script>
+
+<style>
+	.language-switcher {
+		position: relative;
+		isolation: isolate;
+		display: flex;
+		flex-shrink: 0;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		border-radius: 999rem;
+		background-color: var(--gray-999);
+		box-shadow: inset 0 0 0 1px var(--accent-overlay);
+	}
+
+	.indicator {
+		position: absolute;
+		inset: 0 auto 0 0;
+		width: 50%;
+		border-radius: 999rem;
+		background-color: var(--accent-regular);
+		transform: translateX(calc(var(--active-index) * 100%));
+		pointer-events: none;
+		z-index: -1;
+	}
+
+	a {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.5rem;
+		border-radius: 999rem;
+		font-size: var(--text-sm);
+		line-height: 1;
+		color: var(--gray-300);
+		text-decoration: none;
+	}
+
+	img {
+		display: block;
+		width: 1.5rem;
+		height: 1rem;
+		object-fit: cover;
+		border-radius: 0.125rem;
+	}
+
+	a:hover {
+		background-color: var(--accent-subtle-overlay);
+	}
+
+	a:focus-visible {
+		outline: 2px solid var(--accent-regular);
+		outline-offset: 3px;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		a {
+			transition: background-color var(--theme-transition);
+		}
+	}
+
+	@media (forced-colors: active) {
+		a[aria-current='true'] {
+			outline: 1px solid currentColor;
+		}
+	}
+</style>

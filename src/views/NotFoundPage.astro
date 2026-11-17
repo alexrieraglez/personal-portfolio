@@ -1,0 +1,22 @@
+---
+import Hero from '../components/Hero.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLocale, getMessages } from '../i18n';
+
+const messages = getMessages(getLocale(Astro.currentLocale));
+---
+
+<BaseLayout is404 title={messages.notFound.metaTitle} description={messages.notFound.metaDescription}>
+    <div class="not-found">
+        <Hero title={messages.notFound.title} tagline={messages.notFound.tagline} />
+    </div>
+</BaseLayout>
+
+<style>
+    .not-found {
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+</style>

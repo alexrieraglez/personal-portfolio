@@ -1,0 +1,66 @@
+---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import { defaultLocale, getLocale, getMessages, locales, localizePath } from '../i18n';
+
+interface Props {
+	title?: string | undefined;
+	description?: string | undefined;
+	is404?: boolean;
+}
+
+const messages = getMessages(getLocale(Astro.currentLocale));
+const {
+	title = messages.site.title,
+	description = messages.site.description,
+	is404 = false,
+} = Astro.props;
+const alternateHref = (locale: (typeof locales)[number]) => {
+	const path = localizePath(Astro.url.pathname, locale);
+	return Astro.site ? new URL(path, Astro.site).href : path;
+};
+---
+
+<meta charset="utf-8" />
+<meta name="description" property="og:description" content={description} />
+<meta name="viewport" content="width=device-width" />
+<meta name="generator" content={Astro.generator} />
+<title>{title}</title>
+<ClientRouter fallback="swap" />
+
+{!is404 && locales.map((locale) => (
+	<link rel="alternate" hreflang={locale} href={alternateHref(locale)} />
+))}
+{!is404 && <link rel="alternate" hreflang="x-default" href={alternateHref(defaultLocale)} />}
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" href="/favicon.ico" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,700;1,400&family=Rubik:wght@500;600&display=swap"
+	rel="stylesheet"
+/>
+<script is:inline>
+	// Apply before first paint; storage may be unavailable in restricted browsers.
+	(() => {
+		let isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+		try {
+			const saved = localStorage.getItem('theme');
+			if (saved === 'dark' || saved === 'light') isDark = saved === 'dark';
+		} catch {}
+		document.documentElement.classList.toggle('theme-dark', isDark);
+	})();
+</script>
+
+<script>
+	// Carry visual state into the incoming HTML before it can be painted.
+	document.addEventListener('astro:before-swap', (event) => {
+		for (const className of ['theme-dark', 'loaded']) {
+			event.newDocument.documentElement.classList.toggle(
+				className,
+				document.documentElement.classList.contains(className),
+			);
+		}
+	});
+</script>
