@@ -4,6 +4,8 @@ Personal portfolio developed with **Astro and TypeScript**, showcasing my profes
 
 The website is available in **Spanish and English** and is built as a fully static application, with a focus on performance, accessibility, responsive design, and maintainability.
 
+**Live website:** [alejandroriera.dev](https://alejandroriera.dev)
+
 ## Tech Stack
 
 - **Framework:** Astro
@@ -11,6 +13,9 @@ The website is available in **Spanish and English** and is built as a fully stat
 - **Content:** Markdown and Astro Content Collections
 - **Styling:** CSS
 - **Internationalization:** Astro i18n routing
+- **Cloud Infrastructure:** AWS S3, CloudFront, Route 53, ACM, IAM, WAF
+- **Infrastructure as Code:** Terraform
+- **CI/CD:** GitHub Actions with AWS OIDC
 - **Version Control:** Git & GitHub
 
 ## Features
@@ -25,40 +30,61 @@ The website is available in **Spanish and English** and is built as a fully stat
 - Project showcase with dedicated Markdown pages.
 - Downloadable CV in Spanish and English.
 - Links to GitHub, LinkedIn, Credly, and email.
+- Static hosting with HTTPS and a custom domain.
+- Automated deployment to AWS.
 
 ## Project Structure
 
 ```text
+├── .github/
+│   └── workflows/
+│       └── deploy.yml           # CI/CD pipeline
+├── infra/
+│   ├── bootstrap/               # Terraform remote state infrastructure
+│   └── website/
+│       ├── functions/
+│       │   └── rewrite-uri.js   # Astro routing and canonical redirect
+│       ├── acm.tf               # TLS certificate and DNS validation
+│       ├── backend.tf           # Remote Terraform state
+│       ├── cloudfront.tf        # CDN, OAC and edge function
+│       ├── iam.tf               # IAM roles and policies
+│       ├── locals.tf            # Resource naming
+│       ├── oidc.tf              # GitHub OIDC provider
+│       ├── outputs.tf           # Infrastructure outputs
+│       ├── providers.tf         # AWS providers
+│       ├── route53.tf           # DNS configuration
+│       ├── s3.tf                # Private website bucket
+│       └── versions.tf          # Terraform and provider versions
 ├── public/
 │   ├── assets/
-│   │   ├── backgrounds/          # Theme backgrounds
-│   │   ├── docs/                 # Project documents
-│   │   ├── flags/                # Language selector icons
-│   │   └── work/                 # Project images
-│   ├── cv/                       # Spanish and English PDF resumes
+│   │   ├── backgrounds/         # Theme backgrounds
+│   │   ├── docs/                # Project documents
+│   │   ├── flags/               # Language selector icons
+│   │   └── work/                # Project images
+│   ├── cv/                      # Spanish and English PDF resumes
 │   └── favicon.svg
 ├── src/
-│   ├── components/               # Shared UI
-│   ├── content/                  # Markdown project collection
-│   ├── content.config.ts         # Collection loader and schema
-│   ├── i18n/                     # Internationalization
-│   ├── layouts/                  # Shared page layouts
-│   ├── lib/                      # Shared utilities
-│   ├── pages/                    # Spanish routes at the root
-│   │   ├── index.astro           # /
-│   │   ├── about.astro           # /about/
-│   │   ├── work.astro            # /work/
-│   │   ├── work/                 # Global styles and design tokens
-│   │   │   └── [...slug].astro   # /work/<slug>/ (supports nested slugs)
-│   │   ├── en/                   # English routes
-│   │   └── 404.astro             # Global not-found route
-│   ├── styles/
-│   └── views/                    # Page views shared by both languages
-├── tests/                        # Automated test
-├── astro.config.mjs              # Astro, Markdown and i18n configuration
-├── tsconfig.json                 # Strict TypeScript configuration
-├── package.json                  # Dependencies and npm scripts
-└── package-lock.json             # Locked dependency versions
+│   ├── components/              # Shared UI components
+│   ├── content/                 # Markdown project collection
+│   ├── content.config.ts        # Collection loader and schema
+│   ├── i18n/                    # Internationalization
+│   ├── layouts/                 # Shared page layouts
+│   ├── lib/                     # Shared utilities
+│   ├── pages/                   # Localized routes
+│   │   ├── index.astro          # /
+│   │   ├── about.astro          # /about/
+│   │   ├── work.astro           # /work/
+│   │   ├── work/
+│   │   │   └── [...slug].astro  # /work/<slug>/
+│   │   ├── en/                  # English routes
+│   │   └── 404.astro            # Not-found page
+│   ├── styles/                  # Global styles and design tokens
+│   └── views/                   # Views shared by both languages
+├── tests/                       # Automated tests
+├── astro.config.mjs             # Astro and i18n configuration
+├── tsconfig.json                # TypeScript configuration
+├── package.json                 # Dependencies and npm scripts
+└── package-lock.json            # Locked dependency versions
 ```
 
 ## Internationalization
@@ -96,7 +122,7 @@ src/content/work/en/
 
 Each project includes metadata such as its title, description, publication date, tags, and cover image.
 
-The current portfolio showcases:
+The portfolio showcases:
 
 - **Zero Trust Cloud Environments:** Implementation of Zero Trust security principles in an AWS-based cloud architecture.
 - **CiberLab — Web Platform:** Development and enhancement of a malware analysis platform.
@@ -114,8 +140,8 @@ The current portfolio showcases:
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/alexrieraglez/personal-porfolio.git
-cd personal-porfolio
+git clone https://github.com/alexrieraglez/personal-portfolio.git
+cd personal-portfolio
 npm ci
 ```
 
@@ -155,20 +181,173 @@ npm run test:i18n
 
 These tests verify the generated pages, localized routes, navigation, language attributes, and internal links.
 
-## Deployment
+## AWS Architecture
 
-The website is designed for static hosting and does not require a backend or server-side rendering.
+The portfolio is hosted entirely on AWS using a serverless, static architecture.
 
-The planned AWS deployment architecture includes:
+The main components are:
 
-- **Amazon S3:** Storage for static website assets.
-- **Amazon CloudFront:** Content delivery and HTTPS.
-- **AWS Certificate Manager:** TLS certificate management.
-- **Amazon Route 53:** DNS management, depending on the domain configuration.
-- **Terraform:** Infrastructure as Code.
-- **GitHub Actions:** Automated build, validation, and deployment.
+| AWS Service | Purpose |
+|---|---|
+| Amazon S3 | Private storage for generated static assets |
+| Amazon CloudFront | Global content delivery, caching and HTTPS |
+| CloudFront Functions | Astro route rewriting and `www` redirection |
+| Origin Access Control | Restricted access from CloudFront to S3 |
+| Amazon Route 53 | DNS management for `alejandroriera.dev` |
+| AWS Certificate Manager | TLS certificate for the custom domain |
+| AWS WAF | Web application security protections |
+| AWS IAM | Least-privilege deployment permissions and OIDC authentication |
 
-Deployment infrastructure and CI/CD automation will be implemented in a subsequent development phase.
+The website is generated at build time by Astro and does not require a backend server or server-side rendering.
+
+The S3 bucket is private and accessed through CloudFront using Origin Access Control.
+
+The CloudFront Function handles directory-style routes generated by Astro and redirects `www.alejandroriera.dev` to the canonical domain.
+
+### Domain and HTTPS
+
+The website is available at:
+
+**https://alejandroriera.dev**
+
+The custom domain is registered and managed through Amazon Route 53.
+
+DNS records point to the CloudFront distribution using Alias A and AAAA records.
+
+A public TLS certificate issued by AWS Certificate Manager covers both `alejandroriera.dev` and `www.alejandroriera.dev`.
+
+The certificate is managed in `us-east-1`, as required by CloudFront, while the website S3 bucket is hosted in `eu-south-2` (Spain).
+
+Requests to the `www` subdomain are redirected permanently to the canonical domain.
+
+## Infrastructure as Code
+
+The AWS infrastructure is provisioned and maintained using **Terraform**.
+
+Infrastructure configurations are organized into two directories.
+
+### Bootstrap
+
+`infra/bootstrap/` provisions an S3 bucket dedicated to Terraform state storage.
+
+Its configuration includes:
+
+- Server-side encryption with SSE-S3.
+- Bucket versioning.
+- S3 Block Public Access.
+- Protection against accidental deletion.
+
+The bootstrap configuration maintains its own Terraform state separately.
+
+### Website
+
+`infra/website/` manages the website infrastructure, including S3, CloudFront, DNS records, ACM certificates, IAM policies and GitHub OIDC integration.
+
+The Terraform state is stored remotely in the dedicated bootstrap S3 bucket using native S3 state locking.
+
+To initialize and inspect the infrastructure:
+
+```bash
+cd infra/website
+terraform init
+terraform validate
+terraform plan
+```
+
+Infrastructure changes are applied using:
+
+```bash
+terraform apply
+```
+
+Changes should always be reviewed before applying them.
+
+The AWS provider is restricted to the intended AWS account to prevent accidental deployments to another account.
+
+### CloudFront Free Plan
+
+The CloudFront distribution uses the **Free plan ($0/month)**, which includes CDN delivery, core WAF protections and eligible Route 53 DNS usage.
+
+The Route 53 hosted zone is associated with this plan.
+
+The CloudFront Free subscription and its AWS-managed WAF association were configured through the AWS Console. Terraform preserves the externally managed WAF association.
+
+The annual domain registration and other AWS services not covered by the plan may incur separate charges.
+
+## CI/CD
+
+Continuous integration and deployment are automated using **GitHub Actions**.
+
+The workflow is defined in:
+
+```text
+.github/workflows/deploy.yml
+```
+
+### Pull Request Validation
+
+Pull requests targeting `main` trigger the **Build Astro** job:
+
+1. Check out the repository.
+2. Configure Node.js.
+3. Install dependencies using `npm ci`.
+4. Build the website using `npm run build`.
+
+The build job is a required status check for merging into `main`.
+
+### Automatic Deployment
+
+Every push to `main` triggers the deployment pipeline:
+
+1. Build the Astro website.
+2. Authenticate to AWS through GitHub OIDC.
+3. Synchronize the generated `dist/` directory with the S3 website bucket.
+4. Invalidate the CloudFront cache.
+
+This automatically publishes changes after they are merged into the main branch.
+
+### Authentication
+
+GitHub Actions authenticates to AWS using **OpenID Connect (OIDC)** and AWS STS.
+
+The deployment IAM role grants access only to the operations required for publishing the website:
+
+- List the website S3 bucket.
+- Read, upload and delete website objects.
+- Create CloudFront invalidations.
+
+The role's trust policy restricts access to the designated GitHub repository and the `main` branch.
+
+No permanent AWS access keys are stored in GitHub.
+
+## Security
+
+The project incorporates security practices across the infrastructure and development workflow:
+
+- Private S3 buckets with public access blocked.
+- Server-side encryption for S3 storage.
+- CloudFront Origin Access Control.
+- HTTPS using an ACM-managed certificate.
+- AWS WAF core protections.
+- GitHub OIDC authentication with temporary credentials.
+- Least-privilege IAM deployment role.
+- Restricted IAM trust conditions.
+- Terraform remote state with native locking.
+- AWS account restrictions in the Terraform provider.
+- Protected `main` branch with mandatory Pull Requests.
+- Required build validation before merging.
+- GitHub Actions pinned to full commit SHAs.
+- GitHub dependency and secret scanning protections.
+
+## Development Workflow
+
+Development takes place in dedicated feature branches.
+
+Changes are submitted through Pull Requests targeting `main`.
+
+Before merging, GitHub Actions validates that the Astro website builds successfully. Once merged, the deployment pipeline automatically publishes the new version to AWS.
+
+Infrastructure changes are managed independently through Terraform and reviewed before applying them.
 
 ## Credits
 
@@ -182,5 +361,6 @@ Built with [Astro](https://astro.build/).
 
 Computer Engineer | Cybersecurity & Cloud Computing
 
+- [Website](https://alejandroriera.dev)
 - [GitHub](https://github.com/alexrieraglez)
 - [LinkedIn](https://www.linkedin.com/in/alejandro-riera-gonzalez/)
