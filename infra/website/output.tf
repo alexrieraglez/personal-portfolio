@@ -17,3 +17,8 @@ output "website_url" {
   description = "Public URL of the portfolio."
   value       = "https://${aws_cloudfront_distribution.website.domain_name}"
 }
+
+output "github_deploy_role_arn" {
+  description = "IAM role assumed by GitHub Actions via OIDC."
+  value       = aws_iam_role.github_deploy.arn
+}
