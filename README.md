@@ -124,6 +124,7 @@ Each project includes metadata such as its title, description, publication date,
 
 The portfolio showcases:
 
+- **Personal Portfolio:** Development and deployment of a bilingual professional portfolio using Astro and TypeScript, with AWS, Terraform, and GitHub Actions.
 - **Zero Trust Cloud Environments:** Implementation of Zero Trust security principles in an AWS-based cloud architecture.
 - **CiberLab — Web Platform:** Development and enhancement of a malware analysis platform.
 - **CiberLab — Report Generator:** Automated malware analysis reporting using Python, CAPE Sandbox, and large language models.
