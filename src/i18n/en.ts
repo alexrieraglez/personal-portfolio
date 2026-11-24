@@ -145,6 +145,33 @@ export const en = {
 		tagline: 'Explore my projects and discover the technologies and solutions I have worked with',
 		back: 'Projects',
 	},
+	privacy: {
+		metaTitle: 'Privacy Policy | Alejandro Riera',
+		metaDescription: 'Privacy information, technical services and preferences for this personal portfolio.',
+		title: 'Privacy Policy',
+		controller: {
+			title: 'Controller and purpose',
+			description: 'Alejandro Riera González is responsible for this non-commercial personal website, which presents his background and projects for informational and professional purposes. There are no forms, web analytics or advertising.',
+		},
+		hosting: {
+			title: 'Hosting and security',
+			description: 'The website is hosted on Amazon Web Services. To deliver content and protect the website, CloudFront and AWS WAF may process technical request data, such as IP addresses. This processing supports the operation and security of the site.',
+		},
+		theme: {
+			title: 'Theme preference',
+			description: 'The theme selector stores the key theme with the value dark or light in your browser’s localStorage to remember your preference. It is not used for tracking or advertising. You can remove this preference by clearing the site data in your browser.',
+		},
+		external: {
+			title: 'Fonts and external links',
+			description: 'Fonts are loaded from Google Fonts (fonts.googleapis.com and fonts.gstatic.com). When requesting them, your browser connects to Google and sends your IP address and technical request data. Links to external sites, such as LinkedIn, GitHub or Credly, lead to services with their own privacy policies.',
+		},
+		rights: {
+			title: 'Contact and rights',
+			description: 'You may request access to, rectification or erasure of your personal data, as well as object to processing, request its restriction or request data portability, where applicable.',
+			contact: 'For privacy enquiries or to exercise your rights, email',
+			complaint: 'You may also lodge a complaint with the Spanish Data Protection Agency (AEPD). If you contact me by email, your address and message will be used to respond to your enquiry.',
+		},
+	},
 	notFound: {
 		metaTitle: 'Not Found',
 		metaDescription: '404 Error — this page was not found',

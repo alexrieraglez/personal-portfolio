@@ -1,9 +1,10 @@
 ---
 import Icon from './Icon.astro';
-import { getLocale, getMessages } from '../i18n';
+import { getLocale, getMessages, localizePath } from '../i18n';
 
 const currentYear = new Date().getFullYear();
-const messages = getMessages(getLocale(Astro.currentLocale));
+const locale = getLocale(Astro.currentLocale);
+const messages = getMessages(locale);
 ---
 
 <footer>
@@ -13,6 +14,7 @@ const messages = getMessages(getLocale(Astro.currentLocale));
 			<Icon icon="rocket-launch" size="1.2em" />
 		</p>
 		<p>&copy; {currentYear} {messages.site.name}</p>
+		<p><a href={localizePath('/privacy/', locale)}>{messages.privacy.title}</a></p>
 	</div>
 	<p class="socials">
 		<a href="https://linkedin.com/in/alejandro-riera-gonzalez"> LinkedIn</a>
