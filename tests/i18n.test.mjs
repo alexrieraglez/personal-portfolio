@@ -65,7 +65,7 @@ before(() => {
 	assert.ok(existsSync(dist), 'Build the site with npm run build before running these tests.');
 	projectSlugs = markdownSlugs(join(projectRoot, 'src/content/work/es')).sort();
 	pages = locales.flatMap((locale) =>
-		['', 'about', 'work', ...projectSlugs.map((slug) => `work/${slug}`)].map((route) => {
+		['', 'about', 'work', 'privacy', ...projectSlugs.map((slug) => `work/${slug}`)].map((route) => {
 			const path = localizedPath(locale, route);
 			return {
 				locale,

@@ -142,6 +142,33 @@ export const es = {
 		tagline: 'Explora mis proyectos y descubre las tecnologías y soluciones con las que he trabajado',
 		back: 'Proyectos',
 	},
+	privacy: {
+		metaTitle: 'Política de privacidad | Alejandro Riera',
+		metaDescription: 'Información sobre privacidad, servicios técnicos y preferencias de este portfolio personal.',
+		title: 'Política de privacidad',
+		controller: {
+			title: 'Responsable y finalidad',
+			description: 'Alejandro Riera González es el responsable de esta web personal no comercial, cuya finalidad es presentar su trayectoria y proyectos con carácter informativo y profesional. No hay formularios, analítica web ni publicidad.',
+		},
+		hosting: {
+			title: 'Alojamiento y seguridad',
+			description: 'La web se aloja en Amazon Web Services. Para servir el contenido y proteger la web, CloudFront y AWS WAF pueden tratar datos técnicos de las solicitudes, como la dirección IP. Este tratamiento responde al funcionamiento y la seguridad del sitio.',
+		},
+		theme: {
+			title: 'Preferencia de tema',
+			description: 'El selector de tema guarda en el localStorage de tu navegador la clave theme con el valor dark o light para recordar tu preferencia. No se utiliza para seguimiento ni publicidad. Puedes eliminar esta preferencia borrando los datos del sitio en tu navegador.',
+		},
+		external: {
+			title: 'Fuentes y enlaces externos',
+			description: 'Las fuentes se cargan desde Google Fonts (fonts.googleapis.com y fonts.gstatic.com). Al solicitarlas, tu navegador se conecta a Google y comunica tu dirección IP y datos técnicos de la solicitud. Los enlaces a sitios externos, como LinkedIn, GitHub o Credly, llevan a servicios con sus propias políticas de privacidad.',
+		},
+		rights: {
+			title: 'Contacto y derechos',
+			description: 'Puedes solicitar el acceso, rectificación o supresión de tus datos, así como la oposición, limitación del tratamiento o portabilidad, cuando resulten aplicables.',
+			contact: 'Para consultas sobre privacidad o ejercer tus derechos, escribe a',
+			complaint: 'También puedes presentar una reclamación ante la Agencia Española de Protección de Datos (AEPD). Si contactas por correo, se utilizarán tu dirección y el contenido del mensaje para atender tu consulta.',
+		},
+	},
 	notFound: {
 		metaTitle: 'Página no encontrada',
 		metaDescription: 'Error 404 — La página que buscas no existe',
